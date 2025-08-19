@@ -7,7 +7,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
-    "extract": "ts-node src/extraction.ts",
+    "extract": "ts-node src/extract.ts",
+    "analyze": "ts-node src/analyze-features.ts",
+    "suggest": "ts-node src/suggest.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
