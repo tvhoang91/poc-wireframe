@@ -1,18 +1,20 @@
-from transformers import pipeline
-from PIL import Image
 import os
+import base64
+from huggingface_hub import InferenceClient
 from typing import Dict, Any
+from dotenv import load_dotenv
 
+load_dotenv()
 
 def analyze_ui_from_image(image_path: str) -> str:
     """
-    Analyze UI screenshot using Qwen2.5-VL-7B-Instruct model
+    Analyze UI screenshot using Qwen2.5-VL-7B-Instruct model via Inference Client
     """
-    # Initialize the pipeline
-    pipe = pipeline("image-text-to-text", model="Qwen/Qwen2.5-VL-7B-Instruct")
-    
-    # Load the image
-    image = Image.open(image_path)
+    # Initialize the Inference Client
+    client = InferenceClient(
+        provider="hyperbolic",
+        api_key=os.environ["HUGGINGFACE_API_TOKEN"],
+    )
     
     # Define the comprehensive prompt for UI analysis
     comprehensive_prompt = """Analyze this application UI screenshot and provide:
@@ -32,31 +34,44 @@ IMPORTANT GUIDELINES:
 
 Format the response as structured information for extracting application wireframe data."""
     
-    # Prepare messages in the format expected by the model
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {"type": "image", "image": image},
-                {"type": "text", "text": comprehensive_prompt}
-            ]
-        }
-    ]
-    
     try:
-        # Run the analysis
-        result = pipe(messages)
+        # Read and encode image as base64
+        with open(image_path, "rb") as image_file:
+            image_data = base64.b64encode(image_file.read()).decode('utf-8')
         
-        # Extract the generated text from the result
-        if isinstance(result, list) and len(result) > 0:
-            # Handle different response formats
-            if isinstance(result[0], dict):
-                return result[0].get('generated_text', str(result[0]))
-            else:
-                return str(result[0])
-        else:
-            return str(result)
-            
+        # Determine image mime type
+        image_ext = os.path.splitext(image_path)[1].lower()
+        mime_type = {
+            '.png': 'image/png',
+            '.jpg': 'image/jpeg', 
+            '.jpeg': 'image/jpeg'
+        }.get(image_ext, 'image/png')
+        
+        # Prepare the completion request
+        completion = client.chat.completions.create(
+            model="Qwen/Qwen2.5-VL-7B-Instruct",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": comprehensive_prompt
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:{mime_type};base64,{image_data}"
+                            }
+                        }
+                    ]
+                }
+            ],
+        )
+        
+        # Extract the response text
+        return completion.choices[0].message.content
+        
     except Exception as e:
         print(f"Error analyzing image: {e}")
         raise e

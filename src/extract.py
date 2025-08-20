@@ -45,7 +45,7 @@ def main():
             print(f"\nAnalysis saved to: {output_file}")
             
     except Exception as error:
-        print(f"Error reading screenshots directory: {error}")
+        print(f"Extract Error")
 
 
 if __name__ == "__main__":
