@@ -1,8 +1,9 @@
 import os
+import json
 from pathlib import Path
 from datetime import datetime
 from extract.find_screenshots import find_screenshots
-from extract.analyze_image import analyze_ui_from_image
+from extract.analyze_image import analyze_ui_from_image, analyze_feature_from_folder
 
 def main():
     """
@@ -11,39 +12,40 @@ def main():
     print("Begin Extraction!")
     
     # Define screenshots directory
-    screenshots_dir = Path.cwd() / "input" / "screenshots"
+    review_management_screenshots_dir = Path.cwd() / "input" / "feature-review-management"
     
     try:
-        # Find all screenshot files
-        file_info = find_screenshots(str(screenshots_dir))
+        print("\n--- Analyzing Feature with Multi-Image Approach ---")
         
-        print(f"Files in input/screenshots: {{\n"
-              f"  firstImage: {file_info[0]['name'] if file_info else 'none'},\n"
-              f"  imageCount: {len(file_info)}\n}}")
+        feature_analysis = analyze_feature_from_folder(str(review_management_screenshots_dir), "Review Management")
         
-        if file_info:
-            print("\n--- Analyzing first image with Qwen2.5-VL-7B-Instruct ---")
-            first_image = file_info[0]
-            print(f"Analyzing: {first_image['name']}")
-            
-            # Single comprehensive UI analysis call
-            analysis = analyze_ui_from_image(first_image['path'])
-            print("Comprehensive UI Analysis:", analysis)
-            
-            # Save analysis to output file
-            output_dir = Path.cwd() / "output"
-            output_dir.mkdir(exist_ok=True)
-            
-            output_file = output_dir / "analyze-image.text"
-            analysis_content = (
-                f"Image Analysis for: {first_image['name']}\n"
-                f"Analyzed at: {datetime.now().isoformat()}\n\n"
-                f"{analysis}"
-            )
-            
-            output_file.write_text(analysis_content)
-            print(f"\nAnalysis saved to: {output_file}")
-            
+        print("\n=== FEATURE ANALYSIS COMPLETE ===")
+        print(f"Feature: {feature_analysis['feature_name']}")
+        print(f"Images Analyzed: {feature_analysis['metadata']['total_images']}")
+        print("\n--- Analysis Preview ---")
+        print(feature_analysis['analysis_text'][:200] + "..." if len(feature_analysis['analysis_text']) > 200 else feature_analysis['analysis_text'])
+        
+        # Save comprehensive feature analysis
+        output_dir = Path.cwd() / "output"
+        output_dir.mkdir(exist_ok=True)
+        
+        # Save as JSON for structured data
+        json_output_file = output_dir / "feature-analysis.json"
+        with open(json_output_file, 'w') as f:
+            json.dump(feature_analysis, f, indent=2)
+        print(f"\nFeature analysis saved to: {json_output_file}")
+        
+        # Also save readable text version
+        text_output_file = output_dir / "feature-analysis.text"
+        text_content = (
+            f"Feature Analysis: {feature_analysis['feature_name']}\n"
+            f"Generated at: {datetime.now().isoformat()}\n"
+            f"Images analyzed: {', '.join(feature_analysis['images_analyzed'])}\n\n"
+            f"{feature_analysis['analysis_text']}"
+        )
+        text_output_file.write_text(text_content)
+        print(f"Readable analysis saved to: {text_output_file}")
+        
     except Exception as error:
         print(f"Extract Error")
 

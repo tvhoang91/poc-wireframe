@@ -23,9 +23,10 @@ List the MVP features 's screens and their UI structure.
 - suggest MVP features make sense
 - suggest wireframes make sense
 
-## The Solution Ideas
-- human task: install, add data.
-- human task: use apps, collect screenshots, videos, upload these assets to system.
-- ai task: extract UI layout, components from screenshots.
-- ai task: suggest list of features, which one are MVP features.
-- ai task: summarize the extracted data from all apps, suggest wireframes of new app.
+## The Solution Flow
+- human manager task: search apps to analyze
+- human dev task: install apps, add testing data
+- human manager + dev task: group apps 's features. Pinpoint MVP features.
+- human dev task: use MVP features of apps, collect screenshots, videos, upload these assets to system.
+- ai system task: analyze screenshots, videos, extract UI layout, components.
+- ai system task: generate wireframes of new app 's MVP features, base on extracted UI and Brand UI-UX Guidelines.
