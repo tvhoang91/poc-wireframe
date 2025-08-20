@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from datetime import datetime
 from extract.find_screenshots import find_screenshots
-from extract.analyze_image import analyze_ui_from_image, analyze_feature_from_folder
+from extract.analyze_image import analyze_ui_from_image, analyze_feature_from_folder, analyze_screen_from_folder
 
 def main():
     """
@@ -12,36 +12,36 @@ def main():
     print("Begin Extraction!")
     
     # Define screenshots directory
-    review_management_screenshots_dir = Path.cwd() / "input" / "feature-review-management"
+    review_management_screenshots_dir = Path.cwd() / "input" / "screen-review-management"
     
     try:
-        print("\n--- Analyzing Feature with Multi-Image Approach ---")
+        print("\n--- Analyzing Screen with Multi-Image Approach ---")
         
-        feature_analysis = analyze_feature_from_folder(str(review_management_screenshots_dir), "Review Management")
+        screen_analysis = analyze_screen_from_folder(str(review_management_screenshots_dir), "Review Management")
         
-        print("\n=== FEATURE ANALYSIS COMPLETE ===")
-        print(f"Feature: {feature_analysis['feature_name']}")
-        print(f"Images Analyzed: {feature_analysis['metadata']['total_images']}")
+        print("\n=== SCREEN ANALYSIS COMPLETE ===")
+        print(f"Screen: {screen_analysis['screen_name']}")
+        print(f"Images Analyzed: {screen_analysis['metadata']['total_images']}")
         print("\n--- Analysis Preview ---")
-        print(feature_analysis['analysis_text'][:200] + "..." if len(feature_analysis['analysis_text']) > 200 else feature_analysis['analysis_text'])
+        print(screen_analysis['analysis_text'][:200] + "..." if len(screen_analysis['analysis_text']) > 200 else screen_analysis['analysis_text'])
         
-        # Save comprehensive feature analysis
+        # Save comprehensive screen analysis
         output_dir = Path.cwd() / "output"
         output_dir.mkdir(exist_ok=True)
         
         # Save as JSON for structured data
-        json_output_file = output_dir / "feature-analysis.json"
+        json_output_file = output_dir / "screen-analysis.json"
         with open(json_output_file, 'w') as f:
-            json.dump(feature_analysis, f, indent=2)
-        print(f"\nFeature analysis saved to: {json_output_file}")
+            json.dump(screen_analysis, f, indent=2)
+        print(f"\nScreen analysis saved to: {json_output_file}")
         
         # Also save readable text version
-        text_output_file = output_dir / "feature-analysis.text"
+        text_output_file = output_dir / "screen-analysis.text"
         text_content = (
-            f"Feature Analysis: {feature_analysis['feature_name']}\n"
+            f"Screen Analysis: {screen_analysis['screen_name']}\n"
             f"Generated at: {datetime.now().isoformat()}\n"
-            f"Images analyzed: {', '.join(feature_analysis['images_analyzed'])}\n\n"
-            f"{feature_analysis['analysis_text']}"
+            f"Images analyzed: {', '.join(screen_analysis['images_analyzed'])}\n\n"
+            f"{screen_analysis['analysis_text']}"
         )
         text_output_file.write_text(text_content)
         print(f"Readable analysis saved to: {text_output_file}")
