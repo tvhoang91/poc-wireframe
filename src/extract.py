@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from datetime import datetime
 from extract.find_screenshots import find_screenshots
-from extract.analyze_image import analyze_ui_from_image, analyze_feature_from_folder, analyze_screen_from_folder
+from extract.analyze_image_prod import analyze_screen_from_folder
 
 def main():
     """
@@ -30,13 +30,13 @@ def main():
         output_dir.mkdir(exist_ok=True)
         
         # Save as JSON for structured data
-        json_output_file = output_dir / "screen-analysis.json"
+        json_output_file = output_dir / "screen-analysis-prod.json"
         with open(json_output_file, 'w') as f:
             json.dump(screen_analysis, f, indent=2)
         print(f"\nScreen analysis saved to: {json_output_file}")
         
         # Also save readable text version
-        text_output_file = output_dir / "screen-analysis.text"
+        text_output_file = output_dir / "screen-analysis-prod.text"
         text_content = (
             f"Screen Analysis: {screen_analysis['screen_name']}\n"
             f"Generated at: {datetime.now().isoformat()}\n"
